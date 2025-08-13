@@ -30,6 +30,12 @@ public class ProductController {
     public Collection<Product> getProducts() {
         return repository.getProducts();
     }
+    @GET
+    @Path("/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Product getProduct(@PathParam("id") int id) {
+        return repository.getProduct(id);
+    }
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
@@ -55,7 +61,7 @@ public class ProductController {
                 .header("Location", "/product/" + id)
                 .build();
     }
-    
+
     @DELETE
     public RestResponse deleteProduct(@QueryParam("id") int id){
         repository.removeProduct(id);
