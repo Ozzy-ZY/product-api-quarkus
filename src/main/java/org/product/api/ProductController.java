@@ -55,6 +55,11 @@ public class ProductController {
                 .header("Location", "/product/" + id)
                 .build();
     }
-
+    
+    @DELETE
+    public RestResponse deleteProduct(@QueryParam("id") int id){
+        repository.removeProduct(id);
+        return ResponseBuilder.noContent().build();
+    }
 
 }
