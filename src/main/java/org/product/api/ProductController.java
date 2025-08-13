@@ -30,4 +30,15 @@ public class ProductController {
         return repository.getProducts();
     }
 
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    public RestResponse addProduct(Product product) {
+        if (!Product.isValid(product)) {
+            return RestResponse.status(400);
+        }
+        repository.addProduct(product);
+        return ResponseBuilder.ok()
+                .header("Location", "/product/" + product.getId())
+                .build();
+    }
 }
