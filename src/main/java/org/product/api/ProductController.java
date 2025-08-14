@@ -1,10 +1,5 @@
 package org.product.api;
-
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import io.vertx.core.http.HttpServerRequest;
-import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
-import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import org.jboss.resteasy.reactive.RestResponse;
 import org.product.data.Repository;
@@ -14,8 +9,6 @@ import org.jboss.resteasy.reactive.RestResponse.ResponseBuilder;
 
 
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Arrays;
 import java.util.Collection;
 @Path("/product")
 public class ProductController {
@@ -27,14 +20,25 @@ public class ProductController {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Collection<Product> getProducts() {
-        return repository.getProducts();
+    public RestResponse<Collection<Product>> getProducts() {
+        return ResponseBuilder
+                .ok(repository.getProducts())
+                .build();
     }
     @GET
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Product getProduct(@PathParam("id") int id) {
-        return repository.getProduct(id);
+    public RestResponse<Product> getProduct(@PathParam("id") int id) {
+        if (id <= 0) {
+            return RestResponse.status(400);
+        }
+        var product = repository.getProduct(id);
+        if (product == null) {
+            return RestResponse.status(404);
+        }
+        return ResponseBuilder
+                .ok(product)
+                .build();
     }
 
     @POST
