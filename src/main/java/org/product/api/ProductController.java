@@ -2,6 +2,7 @@ package org.product.api;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import org.jboss.resteasy.reactive.RestResponse;
+import org.product.api.requestmodel.AddProductModel;
 import org.product.data.Repository;
 import org.product.data.RepositoryImpl;
 import org.product.data.model.Product;
@@ -43,13 +44,19 @@ public class ProductController {
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    public RestResponse addProduct(Product product) {
+    public RestResponse addProduct(AddProductModel productRequest) {
+        if(repository.isIdempotencyKeyPresent(productRequest.idempotencyKey())){
+            return RestResponse.status(409,"Conflicting request");
+        }
+        repository.addIdempotencyKey(productRequest.idempotencyKey());
+        var product = new Product(productRequest.name(),productRequest.description(), productRequest.price());
         if (!Product.isValid(product)) {
-            return RestResponse.status(400);
+            return RestResponse.status(400,"Product is not valid");
         }
         repository.addProduct(product);
         return RestResponse.created(URI.create("/product/" + product.getId()));
     }
+
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     public RestResponse updateProduct(@QueryParam("id") int id,Product product){

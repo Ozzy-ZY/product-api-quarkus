@@ -11,6 +11,7 @@ public class RepositoryImpl implements Repository{
     private static volatile Repository instance;
     private final Map<Integer, Product> products = new HashMap<>();
     private static int nextId;
+    private Map<String, Object> idempotencyKeys = new HashMap<>();
     private RepositoryImpl() {
         products.put(1, new Product(1, "Product 1", "Description 1", 100.0));
         products.put(2, new Product(2, "Product 2", "Description 2", 200.0));
@@ -29,6 +30,13 @@ public class RepositoryImpl implements Repository{
         }
         return instance;
     }
+    public void addIdempotencyKey(String key){
+        idempotencyKeys.put(key,key);
+    }
+    public boolean isIdempotencyKeyPresent(String key){
+        return idempotencyKeys.containsKey(key);
+    }
+
     @Override
     public Collection<Product> getProducts() {
         return products.values();

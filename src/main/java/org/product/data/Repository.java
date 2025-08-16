@@ -5,6 +5,8 @@ import org.product.data.model.Product;
 import java.util.Collection;
 
 public interface Repository {
+    public void addIdempotencyKey(String key);
+    public boolean isIdempotencyKeyPresent(String key);
     Collection<Product> getProducts();
     public Product getProduct(int id);
     public void addProduct(Product product);
